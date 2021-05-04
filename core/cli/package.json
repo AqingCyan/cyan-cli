@@ -20,7 +20,9 @@
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "dependencies": {
-    "@cyan-cli/utils": "^0.0.2"
+    "@cyan-cli/log": "file:../../utils/log",
+    "import-local": "^3.0.2",
+    "npmlog": "^4.1.2"
   },
   "gitHead": "58e97bd255ef37d33d4fb8d34cefeca15dc123e2",
   "publishConfig": {
