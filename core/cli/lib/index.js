@@ -12,9 +12,16 @@ function core() {
   try {
     checkPkgVersion();
     checkNodeVersion();
+    checkRoot();
   } catch (e) {
     log.error(e);
   }
+}
+
+// 检查root权限，做自动降级处理
+function checkRoot() {
+  const rootCheck = require('root-check');
+  rootCheck();
 }
 
 // 检查node版本
