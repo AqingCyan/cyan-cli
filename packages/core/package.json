@@ -1,6 +1,6 @@
 {
   "name": "@cyan-cli/core",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "cyan-cli core",
   "author": "AqingCyan <aqingcyan@cyanthing.com>",
   "homepage": "",
@@ -20,6 +20,6 @@
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "dependencies": {
-    "@cyan-cli/utils": "^0.0.0"
+    "@cyan-cli/utils": "^0.0.1"
   }
 }
