@@ -2,13 +2,31 @@
 
 module.exports = core;
 
-const pkg = require('../package.json');
+const semver = require('semver');
+const colors = require('colors');
 const log = require('@cyan-cli/log');
+const constant = require('./const');
+const pkg = require('../package.json');
 
 function core() {
-  checkPkgVersion();
+  try {
+    checkPkgVersion();
+    checkNodeVersion();
+  } catch (e) {
+    log.error(e);
+  }
 }
 
+// 检查node版本
+function checkNodeVersion() {
+  const currentVersion = process.version;
+  const lowestNodeVersion = constant.LOWEST_NODE_VERSION;
+  if (!semver.gt(currentVersion, lowestNodeVersion)) {
+    throw new Error(colors.red(`cyan-cli 需要安装 v${lowestNodeVersion} 以上版本的node.js`));
+  }
+}
+
+// 检查cli版本
 function checkPkgVersion() {
   log.notice('cli', pkg.version);
 }
