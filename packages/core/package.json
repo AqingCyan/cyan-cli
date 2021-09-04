@@ -1,6 +1,6 @@
 {
   "name": "@cyan-cli/core",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "cyan-cli core",
   "author": "AqingCyan <aqingcyan@cyanthing.com>",
   "homepage": "https://github.com/AqingCyan/cyan-cli/tree/main/packages/core#readme",
@@ -24,6 +24,6 @@
     "url": "https://github.com/AqingCyan/cyan-cli/issues"
   },
   "dependencies": {
-    "@cyan-cli/utils": "^1.0.0"
+    "@cyan-cli/utils": "^1.0.1"
   }
 }
