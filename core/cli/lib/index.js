@@ -13,7 +13,7 @@ const constant = require('./constant');
 
 let args, config;
 
-function core() {
+async function core() {
   try {
     checkPkgVersion();
     checkNodeVersion();
@@ -21,9 +21,28 @@ function core() {
     checkUserHome();
     checkInputArgs();
     checkEnv();
+    await checkGlobalUpdate();
   } catch (error) {
     const { error: errorLog } = log;
     errorLog(error.message);
+  }
+}
+
+/**
+ * 检查是否需要更新
+ */
+async function checkGlobalUpdate() {
+  // 获取最新版本号和模块名
+  const currentVersion = pkg.version;
+  const npmName = pkg.name;
+  const { getNpmSemverVersion } = require('@cyan-cli/get-npm-info');
+  const lastVersions = await getNpmSemverVersion(currentVersion, npmName);
+
+  // 判断提示是否更新
+  if (lastVersions && semver.gt(lastVersions, currentVersion)) {
+    const { warn } = log;
+    const warnInfo = `请手动更新 ${npmName}，当前版本：${currentVersion}，最新版本：${lastVersions} 更新命令：npm install -g ${npmName}`;
+    warn('更新提示', colors.yellow(warnInfo));
   }
 }
 

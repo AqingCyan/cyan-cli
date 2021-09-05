@@ -27,6 +27,7 @@
     "url": "https://github.com/AqingCyan/cyan-cli/issues"
   },
   "dependencies": {
+    "@cyan-cli/get-npm-info": "file:../../utils/get-npm-info",
     "@cyan-cli/log": "file:../../utils/log",
     "@cyan-cli/utils": "file:../../utils/utils",
     "colors": "^1.4.0",
