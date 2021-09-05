@@ -2,13 +2,16 @@
 
 module.exports = core;
 
+const path = require('path');
 const semver = require('semver');
 const colors = require('colors/safe');
 const userHome = require('user-home');
 const { sync: pathExists } = require('path-exists');
 const pkg = require('../package.json');
-const { notice: noticeLog, error: errorLog } = require('@cyan-cli/log');
+const log = require('@cyan-cli/log');
 const constant = require('./constant');
+
+let args, config;
 
 function core() {
   try {
@@ -16,9 +19,65 @@ function core() {
     checkNodeVersion();
     checkRoot();
     checkUserHome();
+    checkInputArgs();
+    checkEnv();
   } catch (error) {
+    const { error: errorLog } = log;
     errorLog(error.message);
   }
+}
+
+/**
+ * 检查环境变量并注册
+ * 读取的是用户目录下的 .env 文件
+ */
+function checkEnv() {
+  const dotenv = require('dotenv');
+  const dotenvPath = path.resolve(userHome, '.env');
+
+  if (pathExists(dotenvPath)) {
+    config = dotenv.config({ path: dotenvPath });
+  }
+
+  createDefaultConfig();
+}
+
+/**
+ * 创建默认环境变量
+ */
+function createDefaultConfig() {
+  const cliConfig = {
+    home: userHome,
+  };
+
+  if (process.env.CLI_HOME) {
+    cliConfig['cliHome'] = path.join(userHome, process.env.CLI_HOME);
+  } else {
+    cliConfig['cliHome'] = path.join(userHome, constant.DEFAULT_CLI_HOME);
+  }
+
+  process.env.CLI_HOME_PATH = cliConfig.cliHome;
+}
+
+/**
+ * 检查入参
+ */
+function checkInputArgs() {
+  const minimist = require('minimist');
+  args = minimist(process.argv.slice(2));
+  checkArgs();
+}
+
+/**
+ * 检查参数类型是否是 debug
+ */
+function checkArgs() {
+  if (args.debug) {
+    process.env.LOG_LEVEL = 'verbose';
+  } else {
+    process.env.LOG_LEVEL = 'info';
+  }
+  log.level = process.env.LOG_LEVEL;
 }
 
 /**
@@ -54,5 +113,6 @@ function checkNodeVersion() {
  * 检查版本
  */
 function checkPkgVersion() {
+  const { notice: noticeLog } = log;
   noticeLog('cli', pkg.version);
 }
