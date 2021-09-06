@@ -31,6 +31,7 @@
     "@cyan-cli/log": "file:../../utils/log",
     "@cyan-cli/utils": "file:../../utils/utils",
     "colors": "^1.4.0",
+    "commander": "^8.1.0",
     "dotenv": "^10.0.0",
     "import-local": "^3.0.2",
     "minimist": "^1.2.5",

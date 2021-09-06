@@ -6,12 +6,16 @@ const path = require('path');
 const semver = require('semver');
 const colors = require('colors/safe');
 const userHome = require('user-home');
+const commander = require('commander');
 const { sync: pathExists } = require('path-exists');
+
 const pkg = require('../package.json');
 const log = require('@cyan-cli/log');
 const constant = require('./constant');
 
-let args, config;
+let args;
+
+const program = new commander.Command();
 
 async function core() {
   try {
@@ -19,13 +23,56 @@ async function core() {
     checkNodeVersion();
     checkRoot();
     checkUserHome();
-    checkInputArgs();
+    // checkInputArgs();
     checkEnv();
     await checkGlobalUpdate();
+    registerCommand();
   } catch (error) {
     const { error: errorLog } = log;
     errorLog(error.message);
   }
+}
+
+/**
+ * 注册命令
+ */
+function registerCommand() {
+  program
+    .name(Object.keys(pkg.bin)[0])
+    .usage('<command> [options]')
+    .version(pkg.version)
+    .option('-d, --debug', '是否开启调试模式', false);
+
+  /**
+   * 开启 debug 模式
+   */
+  program.on('option:debug', function () {
+    if (program.opts().debug) {
+      process.env.LOG_LEVEL = 'verbose';
+    } else {
+      process.env.LOG_LEVEL = 'info';
+    }
+    log.level = process.env.LOG_LEVEL;
+  });
+
+  /**
+   * 未知命令处理
+   */
+  program.on('command:*', function (obj) {
+    const availableCommands = program.commands.map((cmd) => cmd.name());
+    console.log(colors.red('未知的命令：' + obj[0]));
+    if (availableCommands.length > 0) {
+      console.log(colors.cyan('可用的命令：' + availableCommands.join(',')));
+    }
+  });
+
+  // 没有输入命令
+  if (program.args && program.args.length < 1) {
+    program.outputHelp();
+    console.log();
+  }
+
+  program.parse(process.argv);
 }
 
 /**
@@ -55,7 +102,7 @@ function checkEnv() {
   const dotenvPath = path.resolve(userHome, '.env');
 
   if (pathExists(dotenvPath)) {
-    config = dotenv.config({ path: dotenvPath });
+    dotenv.config({ path: dotenvPath });
   }
 
   createDefaultConfig();
