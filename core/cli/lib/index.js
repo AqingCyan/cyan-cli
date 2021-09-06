@@ -11,6 +11,7 @@ const { sync: pathExists } = require('path-exists');
 
 const pkg = require('../package.json');
 const log = require('@cyan-cli/log');
+const init = require('@cyan-cli/init');
 const constant = require('./constant');
 
 let args;
@@ -42,6 +43,11 @@ function registerCommand() {
     .usage('<command> [options]')
     .version(pkg.version)
     .option('-d, --debug', '是否开启调试模式', false);
+
+  /**
+   * init 命令注册
+   */
+  program.command('init [projectName]').option('-f, --force', '是否强制初始化项目').action(init);
 
   /**
    * 开启 debug 模式
