@@ -11,22 +11,14 @@ const { sync: pathExists } = require('path-exists');
 
 const pkg = require('../package.json');
 const log = require('@cyan-cli/log');
-const init = require('@cyan-cli/init');
 const constant = require('./constant');
-
-let args;
+const init = require('@cyan-cli/init');
 
 const program = new commander.Command();
 
 async function core() {
   try {
-    checkPkgVersion();
-    checkNodeVersion();
-    checkRoot();
-    checkUserHome();
-    // checkInputArgs();
-    checkEnv();
-    await checkGlobalUpdate();
+    await prepare();
     registerCommand();
   } catch (error) {
     const { error: errorLog } = log;
@@ -42,7 +34,8 @@ function registerCommand() {
     .name(Object.keys(pkg.bin)[0])
     .usage('<command> [options]')
     .version(pkg.version)
-    .option('-d, --debug', '是否开启调试模式', false);
+    .option('-d, --debug', '是否开启调试模式', false)
+    .option('-tp, --targetPath <targetPath>', '是否指定本地调试文件路径', '');
 
   /**
    * init 命令注册
@@ -59,6 +52,15 @@ function registerCommand() {
       process.env.LOG_LEVEL = 'info';
     }
     log.level = process.env.LOG_LEVEL;
+  });
+
+  /**
+   * 指定全局的 targetPath，通过环境变量共享该值
+   */
+  program.on('option:targetPath', function () {
+    if (program.opts().targetPath) {
+      process.env.CLI_TARGET_PATH = program.opts().targetPath;
+    }
   });
 
   /**
@@ -79,6 +81,18 @@ function registerCommand() {
   }
 
   program.parse(process.argv);
+}
+
+/**
+ * 脚手架执行的预先检查
+ */
+async function prepare() {
+  checkPkgVersion();
+  checkNodeVersion();
+  checkRoot();
+  checkUserHome();
+  checkEnv();
+  await checkGlobalUpdate();
 }
 
 /**
@@ -129,27 +143,6 @@ function createDefaultConfig() {
   }
 
   process.env.CLI_HOME_PATH = cliConfig.cliHome;
-}
-
-/**
- * 检查入参
- */
-function checkInputArgs() {
-  const minimist = require('minimist');
-  args = minimist(process.argv.slice(2));
-  checkArgs();
-}
-
-/**
- * 检查参数类型是否是 debug
- */
-function checkArgs() {
-  if (args.debug) {
-    process.env.LOG_LEVEL = 'verbose';
-  } else {
-    process.env.LOG_LEVEL = 'info';
-  }
-  log.level = process.env.LOG_LEVEL;
 }
 
 /**
