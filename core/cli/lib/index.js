@@ -13,6 +13,7 @@ const pkg = require('../package.json');
 const log = require('@cyan-cli/log');
 const constant = require('./constant');
 const init = require('@cyan-cli/init');
+const exec = require('@cyan-cli/exec');
 
 const program = new commander.Command();
 
@@ -40,13 +41,13 @@ function registerCommand() {
   /**
    * init 命令注册
    */
-  program.command('init [projectName]').option('-f, --force', '是否强制初始化项目').action(init);
+  program.command('init [projectName]').option('-f, --force', '是否强制初始化项目').action(exec);
 
   /**
    * 开启 debug 模式
    */
   program.on('option:debug', function () {
-    if (program.opts().debug) {
+    if (program.debug) {
       process.env.LOG_LEVEL = 'verbose';
     } else {
       process.env.LOG_LEVEL = 'info';
@@ -58,7 +59,7 @@ function registerCommand() {
    * 指定全局的 targetPath，通过环境变量共享该值
    */
   program.on('option:targetPath', function () {
-    if (program.opts().targetPath) {
+    if (program.targetPath) {
       process.env.CLI_TARGET_PATH = program.opts().targetPath;
     }
   });

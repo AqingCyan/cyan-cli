@@ -27,12 +27,13 @@
     "url": "https://github.com/AqingCyan/cyan-cli/issues"
   },
   "dependencies": {
+    "@cyan-cli/exec": "file:../exec",
     "@cyan-cli/get-npm-info": "file:../../utils/get-npm-info",
     "@cyan-cli/init": "file:../../commands/init",
     "@cyan-cli/log": "file:../../utils/log",
     "@cyan-cli/utils": "file:../../utils/utils",
     "colors": "^1.4.0",
-    "commander": "^8.1.0",
+    "commander": "^6.2.1",
     "dotenv": "^10.0.0",
     "import-local": "^3.0.2",
     "npmlog": "^5.0.1",
