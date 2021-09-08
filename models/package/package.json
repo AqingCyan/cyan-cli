@@ -30,6 +30,7 @@
     "@cyan-cli/format-path": "file:../../utils/format-path",
     "@cyan-cli/get-npm-info": "file:../../utils/get-npm-info",
     "@cyan-cli/utils": "file:../../utils/utils",
+    "fs-extra": "^7.0.1",
     "npminstall": "^4.10.0",
     "path-exists": "^4.0.0",
     "pkg-dir": "^5.0.0"

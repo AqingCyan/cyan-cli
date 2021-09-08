@@ -1,6 +1,7 @@
 'use strict';
 
 const path = require('path');
+const fse = require('fs-extra');
 const pkgDir = require('pkg-dir').sync;
 const npminstall = require('npminstall');
 const pathExists = require('path-exists').sync;
@@ -35,16 +36,37 @@ class Package {
     this.cacheFilePathPrefix = this.packageName.replace('/', '_');
   }
 
+  /**
+   * 预先处理
+   */
   async prepare() {
+    // 判断是否有缓存目录，没有则创建一个
+    if (this.storeDir && !pathExists(this.storeDir)) {
+      fse.mkdirpSync(this.storeDir);
+    }
+
+    // 当 package 的版本是 latest 时，获取最新版本号
     if (this.packageVersion === 'latest') {
       this.packageVersion = await getNpmLatestVersion(this.packageName);
     }
   }
 
+  // 缓存中依赖的文件名
   get cacheFilePath() {
     return path.resolve(
       this.storeDir,
       `_${this.cacheFilePathPrefix}@${this.packageVersion}@${this.packageName}`,
+    );
+  }
+
+  /**
+   * 获取指定版本的缓存 package 路径
+   * @param packageVersion
+   */
+  getSpecificCacheFilePath(packageVersion) {
+    return path.resolve(
+      this.storeDir,
+      `_${this.cacheFilePathPrefix}@${packageVersion}@${this.packageName}`,
     );
   }
 
@@ -77,7 +99,23 @@ class Package {
   /**
    * 更新 package
    */
-  update() {}
+  async update() {
+    await this.prepare();
+
+    // 获取最新版本号并查询缓存，没有则安装最新版
+    const latestPackageVersion = await getNpmLatestVersion(this.packageName);
+    const latestFilePath = this.getSpecificCacheFilePath(latestPackageVersion);
+
+    if (!pathExists(latestFilePath)) {
+      await npminstall({
+        root: this.targetPath,
+        storeDir: this.storeDir,
+        registry: getDefaultRegistry(),
+        pkgs: [{ name: this.packageName, version: latestPackageVersion }],
+      });
+      this.packageVersion = latestPackageVersion;
+    }
+  }
 
   /**
    * 获取入口文件路径
