@@ -5,7 +5,7 @@ const { verbose: verboseLog } = require('@cyan-cli/log');
 const path = require('path');
 
 const SETTINGS = {
-  init: '@cyan-cli/init',
+  init: '@cyan-cli/core', // TODO 记得改回来
 };
 
 const CACHE_DIR = 'dependencies';
@@ -34,8 +34,9 @@ async function exec() {
 
     pkg = new Package({ targetPath, packageName, packageVersion, storeDir });
 
-    if (pkg.exists()) {
+    if (await pkg.exists()) {
       // 更新 package
+      console.log('更新 package');
     } else {
       await pkg.install(); // 安装 package
     }

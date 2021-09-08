@@ -3,9 +3,10 @@
 const path = require('path');
 const pkgDir = require('pkg-dir').sync;
 const npminstall = require('npminstall');
+const pathExists = require('path-exists').sync;
 
 const { isObject } = require('@cyan-cli/utils');
-const { getDefaultRegistry } = require('@cyan-cli/get-npm-info');
+const { getDefaultRegistry, getNpmLatestVersion } = require('@cyan-cli/get-npm-info');
 const formatPath = require('@cyan-cli/format-path');
 
 class Package {
@@ -29,22 +30,47 @@ class Package {
 
     // package的版本
     this.packageVersion = options.packageVersion;
+
+    // package的缓存目录前缀
+    this.cacheFilePathPrefix = this.packageName.replace('/', '_');
+  }
+
+  async prepare() {
+    if (this.packageVersion === 'latest') {
+      this.packageVersion = await getNpmLatestVersion(this.packageName);
+    }
+  }
+
+  get cacheFilePath() {
+    return path.resolve(
+      this.storeDir,
+      `_${this.cacheFilePathPrefix}@${this.packageVersion}@${this.packageName}`,
+    );
   }
 
   /**
    * 判断当前 package 是否存在
    */
-  exists() {}
+  async exists() {
+    if (this.storeDir) {
+      await this.prepare();
+      return pathExists(this.cacheFilePath);
+    } else {
+      return pathExists(this.targetPath);
+    }
+  }
 
   /**
    * 安装 package
    */
-  install() {
+  async install() {
+    await this.prepare();
+
     return npminstall({
       root: this.targetPath,
       storeDir: this.storeDir,
       registry: getDefaultRegistry(),
-      pkg: [{ name: this.packageName, version: this.packageVersion }],
+      pkgs: [{ name: this.packageName, version: this.packageVersion }],
     });
   }
 
