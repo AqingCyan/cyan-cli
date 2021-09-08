@@ -2,8 +2,10 @@
 
 const path = require('path');
 const pkgDir = require('pkg-dir').sync;
+const npminstall = require('npminstall');
 
 const { isObject } = require('@cyan-cli/utils');
+const { getDefaultRegistry } = require('@cyan-cli/get-npm-info');
 const formatPath = require('@cyan-cli/format-path');
 
 class Package {
@@ -18,6 +20,9 @@ class Package {
 
     // package的目标路径
     this.targetPath = options.targetPath;
+
+    // package的缓存路径
+    this.storeDir = options.storeDir;
 
     // package的名字
     this.packageName = options.packageName;
@@ -34,7 +39,14 @@ class Package {
   /**
    * 安装 package
    */
-  install() {}
+  install() {
+    return npminstall({
+      root: this.targetPath,
+      storeDir: this.storeDir,
+      registry: getDefaultRegistry(),
+      pkg: [{ name: this.packageName, version: this.packageVersion }],
+    });
+  }
 
   /**
    * 更新 package

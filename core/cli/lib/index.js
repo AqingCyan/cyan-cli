@@ -24,6 +24,9 @@ async function core() {
   } catch (error) {
     const { error: errorLog } = log;
     errorLog(error.message);
+    if (process.env.LOG_LEVEL === 'verbose') {
+      console.log(error);
+    }
   }
 }
 
