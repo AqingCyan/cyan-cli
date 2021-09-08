@@ -5,7 +5,7 @@ const { verbose: verboseLog } = require('@cyan-cli/log');
 const path = require('path');
 
 const SETTINGS = {
-  init: '@cyan-cli/core', // TODO 记得改回来
+  init: '@cyan-cli/init',
 };
 
 const CACHE_DIR = 'dependencies';
@@ -22,7 +22,7 @@ async function exec() {
   const cmdObj = arguments[arguments.length - 1];
   const cmdName = cmdObj.name();
   const packageName = SETTINGS[cmdName];
-  const packageVersion = '0.0.2'; // TODO 记得改回来
+  const packageVersion = 'latest';
 
   if (!targetPath) {
     // 没有缓存路径则生成缓存路径

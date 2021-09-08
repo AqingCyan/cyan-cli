@@ -121,18 +121,25 @@ class Package {
    * 获取入口文件路径
    */
   getRootFilePath() {
-    // 获取 package.json 的路径
-    const dir = pkgDir(this.targetPath);
+    function _getRootFile(targetPath) {
+      // 获取 package.json 的路径
+      const dir = pkgDir(targetPath);
 
-    // 检查判断并返回 package 入口文件路径
-    if (dir) {
-      const pkgFile = require(path.resolve(dir, 'package.json'));
-      if (pkgFile && pkgFile.main) {
-        return formatPath(path.resolve(dir, pkgFile.main));
+      // 检查判断并返回 package 入口文件路径
+      if (dir) {
+        const pkgFile = require(path.resolve(dir, 'package.json'));
+        if (pkgFile && pkgFile.main) {
+          return formatPath(path.resolve(dir, pkgFile.main));
+        }
       }
+      return null;
     }
 
-    return null;
+    if (this.storeDir) {
+      return _getRootFile(this.cacheFilePath);
+    } else {
+      return _getRootFile(this.targetPath);
+    }
   }
 }
 
