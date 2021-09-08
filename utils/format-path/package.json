@@ -1,9 +1,9 @@
 {
-  "name": "@cyan-cli/package",
+  "name": "@cyan-cli/format-path",
   "version": "1.0.1",
-  "description": "cyan-cli npm modules",
+  "description": "> TODO: description",
   "author": "AqingCyan <aqingcyan@cyanthing.com>",
-  "homepage": "https://github.com/AqingCyan/cyan-cli/tree/main/core/package#readme",
+  "homepage": "https://github.com/AqingCyan/cyan-cli/tree/main/core/format-path#readme",
   "license": "ISC",
   "main": "lib/index.js",
   "directories": {
@@ -25,10 +25,5 @@
   },
   "bugs": {
     "url": "https://github.com/AqingCyan/cyan-cli/issues"
-  },
-  "dependencies": {
-    "@cyan-cli/format-path": "file:../../utils/format-path",
-    "@cyan-cli/utils": "file:../../utils/utils",
-    "pkg-dir": "^5.0.0"
   }
 }

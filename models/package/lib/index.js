@@ -1,6 +1,10 @@
 'use strict';
 
+const path = require('path');
+const pkgDir = require('pkg-dir').sync;
+
 const { isObject } = require('@cyan-cli/utils');
+const formatPath = require('@cyan-cli/format-path');
 
 class Package {
   constructor(options) {
@@ -12,11 +16,8 @@ class Package {
       throw new Error('Package类的options必须为对象');
     }
 
-    // package的路径
+    // package的目标路径
     this.targetPath = options.targetPath;
-
-    // package的存储路径
-    this.storePath = options.storePath;
 
     // package的名字
     this.packageName = options.packageName;
@@ -43,7 +44,20 @@ class Package {
   /**
    * 获取入口文件路径
    */
-  getRootFilePath() {}
+  getRootFilePath() {
+    // 获取 package.json 的路径
+    const dir = pkgDir(this.targetPath);
+
+    // 检查判断并返回 package 入口文件路径
+    if (dir) {
+      const pkgFile = require(path.resolve(dir, 'package.json'));
+      if (pkgFile && pkgFile.main) {
+        return formatPath(path.resolve(dir, pkgFile.main));
+      }
+    }
+
+    return null;
+  }
 }
 
 module.exports = Package;
