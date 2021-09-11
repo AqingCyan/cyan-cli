@@ -1,7 +1,7 @@
 'use strict';
 
 const Package = require('@cyan-cli/package');
-const { verbose: verboseLog } = require('@cyan-cli/log');
+const { verbose: verboseLog, error: errorLog } = require('@cyan-cli/log');
 const path = require('path');
 
 const SETTINGS = {
@@ -45,7 +45,11 @@ async function exec() {
 
   const rootFile = pkg.getRootFilePath();
   if (rootFile) {
-    require(rootFile).apply(null, arguments);
+    try {
+      require(rootFile).call(null, Array.from(arguments));
+    } catch (error) {
+      errorLog(error);
+    }
   }
 }
 

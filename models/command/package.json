@@ -1,9 +1,9 @@
 {
-  "name": "@cyan-cli/init",
+  "name": "@cyan-cli/command",
   "version": "1.0.1",
-  "description": "cyan-cli init",
+  "description": "> TODO: description",
   "author": "AqingCyan <aqingcyan@cyanthing.com>",
-  "homepage": "https://github.com/AqingCyan/cyan-cli/tree/main/core/init#readme",
+  "homepage": "https://github.com/AqingCyan/cyan-cli/tree/main/core/Command#readme",
   "license": "ISC",
   "main": "lib/index.js",
   "directories": {
@@ -27,7 +27,8 @@
     "url": "https://github.com/AqingCyan/cyan-cli/issues"
   },
   "dependencies": {
-    "@cyan-cli/command": "file:../../models/command",
-    "@cyan-cli/log": "file:../../utils/log"
+    "@cyan-cli/log": "file:../../utils/log",
+    "colors": "^1.4.0",
+    "semver": "^7.3.5"
   }
 }

@@ -12,7 +12,6 @@ const { sync: pathExists } = require('path-exists');
 const pkg = require('../package.json');
 const log = require('@cyan-cli/log');
 const constant = require('./constant');
-const init = require('@cyan-cli/init');
 const exec = require('@cyan-cli/exec');
 
 const program = new commander.Command();
@@ -92,7 +91,6 @@ function registerCommand() {
  */
 async function prepare() {
   checkPkgVersion();
-  checkNodeVersion();
   checkRoot();
   checkUserHome();
   checkEnv();
@@ -164,18 +162,6 @@ function checkUserHome() {
 function checkRoot() {
   const rootCheck = require('root-check');
   rootCheck();
-}
-
-/**
- * 检查node版本
- */
-function checkNodeVersion() {
-  const currentVersion = process.version;
-  const lowestNodeVersion = constant.LOWEST_NODE_VERSION;
-
-  if (!semver.gte(currentVersion, lowestNodeVersion)) {
-    throw new Error(colors.red(`cyan-cli 需要安装 v${lowestNodeVersion} 以上版本的 Node.js`));
-  }
 }
 
 /**
