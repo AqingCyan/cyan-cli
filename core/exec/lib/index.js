@@ -50,10 +50,23 @@ async function exec() {
     try {
       /**
        * 在当前进程执行：require(rootFile).call(null, Array.from(arguments));
-       * 在node子进程执行如下，用 child_process.spawn 执行，需要把上面👆的语句转化成 code
+       * 若想在 node 子进程执行如下，用 child_process.spawn 执行，需要把上面的语句转化成 code
        * inherit 有妙用，看 http://nodejs.cn/api/child_process.html
+       * args 需要给它瘦身处理一下，只捡入命令执行需要的参数：
+       * 因为 child_process 中的 spawn 接受的参数类型是字符串而 argument 是数组不能直接传递，
+       * 如果直接使用 JSON.stringify 转换为字符串会因为 arguments 中的循环引用造成报错，所以才会对参数进行处理后使用
        */
-      const code = 'console.log(123)';
+      const args = Array.from(arguments);
+      const cmd = args[args.length - 1];
+      const o = Object.create(null); // 纯粹的对象，没有原型链，内存占用小
+      Object.keys(cmd).forEach((key) => {
+        if (cmd.hasOwnProperty(key) && !key.startsWith('_') && key !== 'parent') {
+          o[key] = cmd[key];
+        }
+      });
+      args[args.length - 1] = o;
+      const code = `require('${rootFile}').call(null, ${JSON.stringify(args)})`;
+
       const child = cp.spawn('node', ['-e', code], {
         cwd: process.cwd(),
         stdio: 'inherit',
