@@ -1,8 +1,10 @@
 'use strict';
 
+const path = require('path');
+const cp = require('child_process');
+
 const Package = require('@cyan-cli/package');
 const { verbose: verboseLog, error: errorLog } = require('@cyan-cli/log');
-const path = require('path');
 
 const SETTINGS = {
   init: '@cyan-cli/init',
@@ -46,7 +48,26 @@ async function exec() {
   const rootFile = pkg.getRootFilePath();
   if (rootFile) {
     try {
-      require(rootFile).call(null, Array.from(arguments));
+      /**
+       * 在当前进程执行：require(rootFile).call(null, Array.from(arguments));
+       * 在node子进程执行如下，用 child_process.spawn 执行，需要把上面👆的语句转化成 code
+       * inherit 有妙用，看 http://nodejs.cn/api/child_process.html
+       */
+      const code = 'console.log(123)';
+      const child = cp.spawn('node', ['-e', code], {
+        cwd: process.cwd(),
+        stdio: 'inherit',
+      });
+
+      child.on('error', (error) => {
+        errorLog(error);
+        process.exit(1);
+      });
+
+      child.on('exit', (code) => {
+        verboseLog('命令执行成功: ', code);
+        process.exit(code);
+      });
     } catch (error) {
       errorLog(error);
     }
