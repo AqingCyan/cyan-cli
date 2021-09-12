@@ -1,6 +1,8 @@
 'use strict';
 
 const fs = require('fs');
+const inquirer = require('inquirer');
+const fse = require('fs-extra');
 
 const Command = require('@cyan-cli/command');
 const { verbose: verboseLog, error: errorLog } = require('@cyan-cli/log');
@@ -20,9 +22,12 @@ class InitCommand extends Command {
   /**
    * 实现 init 命令执行
    */
-  exec() {
+  async exec() {
     try {
-      this.prepare();
+      const ret = await this.prepare();
+
+      if (ret) {
+      }
     } catch (error) {
       errorLog(error);
     }
@@ -31,17 +36,45 @@ class InitCommand extends Command {
   /**
    * init exec 准备阶段：判断当前目录是否为空，是否强制更新，选择创建项目和组件，获取项目基本信息
    */
-  prepare() {
-    if (this.isCwdEmpty()) {
+  async prepare() {
+    const localPath = process.cwd();
+
+    if (!this.isDirEmpty(localPath)) {
+      let ifContinue = false;
+
+      if (!this.force) {
+        const { isContinue } = await inquirer.prompt({
+          type: 'confirm',
+          name: 'isContinue',
+          default: false,
+          message: '当前文件夹不为空，是否继续创建项目？',
+        });
+
+        if (!isContinue) return;
+        ifContinue = isContinue;
+      }
+
+      if (ifContinue || this.force) {
+        const { confirmDelete } = await inquirer.prompt({
+          type: 'confirm',
+          name: 'confirmDelete',
+          default: false,
+          message: '是否确认清空当前目录下的文件？',
+        });
+
+        if (confirmDelete) {
+          fse.emptyDirSync(localPath);
+        }
+      }
     }
   }
 
   /**
    * 判断安装模板目录是否为空
+   * @param localPath
    * @returns {boolean}
    */
-  isCwdEmpty() {
-    const localPath = process.cwd();
+  isDirEmpty(localPath) {
     let fileList = fs.readdirSync(localPath);
     fileList = fileList.filter(
       (file) => !file.startsWith('.') && ['node_modules'].indexOf(file) < 0,
